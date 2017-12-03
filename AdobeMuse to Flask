@@ -1,0 +1,54 @@
+import re
+#import fileinput
+
+#set your RegexObject
+#2 groups would be okay but i placed 3 because i thought i would need to edit the 1st & 2nd separately
+objAssets = re.compile(r'(assets\/)(.*?)(\")')
+objCss = re.compile(r'(css\/)(.*?)(\")')
+objImages = re.compile(r'(images\/)(.*?)(\")')
+objScripts = re.compile(r'(scripts\/)(.*?)(\")')
+objCrc = re.compile(r'\?crc=\d*')
+
+def changeItem(line, folder):
+    if folder == "assets":
+        newLine = objAssets.sub(r"{{ url_for('static', filename='\1\2') }}\3", line)
+        return newLine
+    if folder == "css":
+        newLine = objCss.sub(r"{{ url_for('static', filename='\1\2') }}\3", line)
+        return newLine
+    if folder == "images":
+        newLine = objImages.sub(r"{{ url_for('static', filename='\1\2') }}\3", line)
+        return newLine
+    if folder == "scripts":
+        newLine = objScripts.sub(r"{{ url_for('static', filename='\1\2') }}\3", line)
+        return newLine
+    if folder == "crc":
+        newLine = objCrc.sub(r'', line)
+        return newLine
+    
+
+with open("/home/tatmush/Documents/projects/changeIndex/index.txt", "r+") as f:
+    with open("/home/tatmush/Documents/projects/changeIndex/indexChanged.txt", "w") as newFile:
+        for line in f:
+        #for line in fileinput.input("/home/tatmush/Documents/projects/changeIndex/index.txt", inplace=True);
+            
+            if "assets/" in line:
+                line = changeItem(line, "assets")
+                
+            if "css/" in line:
+                line = changeItem(line, "css")
+                
+            if "images/" in line:
+                line = changeItem(line, "images")
+                
+            if "scripts/" in line:
+                line = changeItem(line, "scripts")
+
+            #remove the confusing crc
+            if "crc=" in line:
+                line = changeItem(line, "crc")
+            
+
+            newFile.write(line)
+
+print("done")
